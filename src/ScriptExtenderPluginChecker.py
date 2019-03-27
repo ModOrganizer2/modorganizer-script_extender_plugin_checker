@@ -151,11 +151,13 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return mobase.VersionInfo(1, 0, 0, mobase.ReleaseType.prealpha)
 
     def isActive(self):
-        # This is never called, but it should be.
-        return self.__organizer.managedGame().gameName() in self.supportedGames
+        return ( self.__organizer.managedGame().gameName() in self.supportedGames
+             and self.__organizer.pluginSetting(self.name(), "enabled") == True)
 
     def settings(self):
-        return []
+        return [
+            mobase.PluginSetting("enabled", self.__tr("Enable the plugin"), True)
+            ]
 
     def activeProblems(self):
         if self.__scanLog():
@@ -170,12 +172,12 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         pluginList = self.__listBadPluginMessagess()
         pluginListString = "\n  • " + ("\n  • ".join(pluginList))
         return self.__tr("You have one or more script extender plugins which failed to load!\n\n "
-        	             "If you want this notification to go away, here are some steps you can take:\n"
-        	             "  • Look for updates to the mod or the specific plugin included in the mod.\n"
-        	             "  • Disable the mod containing the plugin.\n"
-        	             "  • Hide or delete the plugin from the mod.\n\n"
-        	             "To refresh the script extender log, you will need to run the game again!\n\n"
-        	             "The failed plugins are:{0}").format(pluginListString)
+                         "If you want this notification to go away, here are some steps you can take:\n"
+                         "  • Look for updates to the mod or the specific plugin included in the mod.\n"
+                         "  • Disable the mod containing the plugin.\n"
+                         "  • Hide or delete the plugin from the mod.\n\n"
+                         "To refresh the script extender log, you will need to run the game again!\n\n"
+                         "The failed plugins are:{0}").format(pluginListString)
 
     def hasGuidedFix(self, key):
         return False
