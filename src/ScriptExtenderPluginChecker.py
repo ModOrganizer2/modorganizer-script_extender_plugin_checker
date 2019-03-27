@@ -90,7 +90,7 @@ class CouldntLoadPluginMessage(PluginMessage):
     def __tr(self, str):
         return QCoreApplication.translate("CouldntLoadPluginMessage", str)
 
-PluginMessage.registerMessageType((re.compile(r"couldn't load plugin (?P<pluginPath>.+) \(Error (?P<lastError>[-+]?\d+)\)\s"), CouldntLoadPluginMessage))
+PluginMessage.registerMessageType((re.compile(r"couldn't load plugin (?P<pluginPath>.+) \(Error (code )?(?P<lastError>[-+]?\d+).*\)\s"), CouldntLoadPluginMessage))
 
 
 class NotAPluginMessage(PluginMessage):
