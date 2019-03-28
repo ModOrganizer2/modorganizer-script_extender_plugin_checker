@@ -2,6 +2,7 @@ from enum import Enum, auto
 from pathlib import Path
 import re
 import sys
+from collections import namedtuple
 
 from PyQt5.QtCore import QCoreApplication, qDebug
 
@@ -22,6 +23,9 @@ class PluginMessage():
 
     def __tr(self, str):
         return QCoreApplication.translate("PluginMessage", str)
+
+    def pluginPath(self):
+        return self._pluginPath
 
     messageTypes = []
 
@@ -115,16 +119,17 @@ class LogLocation(Enum):
 
 class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
 
+    GameType = namedtuple(("GameType"), ("base", "gameSuffix", "editorSuffix"))
     supportedGames = {
-        "Skyrim" : (LogLocation.DOCS, Path("SKSE") / "skse.log"),
-        "Skyrim Special Edition" : (LogLocation.DOCS, Path("SKSE") / "skse64.log"),
-        "Skyrim VR" : (LogLocation.DOCS, Path("SKSE") / "sksevr.log"),
-        #"Enderal" : (LogLocation.DOCS, Path("")),
-        "Fallout 4" : (LogLocation.DOCS, Path("F4SE") / "f4se.log"),
-        "Oblivion" : (LogLocation.INSTALL, Path("obse.log")),
-        "New Vegas" : (LogLocation.INSTALL, Path("nvse.log")),
-        "TTW" : (LogLocation.INSTALL, Path("ttw_nvse.log")),
-        "Fallout 3" : (LogLocation.INSTALL, Path("fose.log"))
+        "Skyrim" : GameType(LogLocation.DOCS, Path("SKSE") / "skse.log", Path("SKSE") / "skse_editor.log"),
+        "Skyrim Special Edition" : GameType(LogLocation.DOCS, Path("SKSE") / "skse64.log", None), # No editor log defined
+        "Skyrim VR" : GameType(LogLocation.DOCS, Path("SKSE") / "sksevr.log", None), # No editor log defined
+        #"Enderal" : GameType(LogLocation.DOCS, Path("")),
+        "Fallout 4" : GameType(LogLocation.DOCS, Path("F4SE") / "f4se.log", None), # No editor log defined
+        "Oblivion" : GameType(LogLocation.INSTALL, Path("obse.log"), Path("obse_editor.log")),
+        "New Vegas" : GameType(LogLocation.INSTALL, Path("nvse.log"), Path("nvse_editor.log")),
+        "TTW" : GameType(LogLocation.INSTALL, Path("ttw_nvse.log"), Path("nvse_editor.log")), # TODO: Needs to be confirmed
+        "Fallout 3" : GameType(LogLocation.INSTALL, Path("fose.log"), Path("fose_editor.log"))
     }
 
     def __init__(self):
@@ -176,7 +181,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
                          "  • Look for updates to the mod or the specific plugin included in the mod.\n"
                          "  • Disable the mod containing the plugin.\n"
                          "  • Hide or delete the plugin from the mod.\n\n"
-                         "To refresh the script extender log, you will need to run the game again!\n\n"
+                         "To refresh the script extender logs, you will need to run the game and/or editor again!\n\n"
                          "The failed plugins are:{0}").format(pluginListString)
 
     def hasGuidedFix(self, key):
@@ -189,53 +194,68 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return QCoreApplication.translate("ScriptExtenderPluginChecker", str)
 
     def __scanLog(self):
-        if self.__organizer.managedGame().gameName() not in self.supportedGames:
-            return False
-
-        base, suffix = self.supportedGames[self.__organizer.managedGame().gameName()]
-
-        if base == LogLocation.DOCS:
-            base = Path(self.__organizer.managedGame().documentsDirectory().absolutePath())
-        elif base == LogLocation.INSTALL:
-            base = Path(self.__organizer.managedGame().gameDirectory().absolutePath())
-
-        logPath = base / suffix
-
-        try:
-            with logPath.open('r') as logFile:
-                for line in logFile:
-                    pluginMessage = PluginMessage.PluginMessageFactory(line, self.__organizer)
-                    if pluginMessage and not pluginMessage.successful():
-                        return True
-        except Exception as e:
-            qDebug(str(e))
-            # There's almost certainly just no log yet
-            pass
-
-        return False
+        return len(self.__listBadPluginMessagess()) > 0
 
     def __listBadPluginMessagess(self):
-        base, suffix = self.supportedGames[self.__organizer.managedGame().gameName()]
+        base, gameSuffix, editorSuffix = self.supportedGames[self.__organizer.managedGame().gameName()]
 
         if base == LogLocation.DOCS:
             base = Path(self.__organizer.managedGame().documentsDirectory().absolutePath())
         elif base == LogLocation.INSTALL:
             base = Path(self.__organizer.managedGame().gameDirectory().absolutePath())
 
-        logPath = base / suffix
-
         messageList = []
+        editorMessageList = []
+        gameMessageList = []
 
-        try:
-            with logPath.open('r') as logFile:
-                for line in logFile:
-                    pluginMessage = PluginMessage.PluginMessageFactory(line, self.__organizer)
-                    if pluginMessage and not pluginMessage.successful():
-                        messageList.append(pluginMessage.asMessage())
-        except Exception as e:
-            qDebug(str(e))
-            # There's almost certainly just no log yet
-            pass
+        if gameSuffix is not None:
+            gameLogPath = base / gameSuffix
+            if gameLogPath.exists():
+                try:
+                    with gameLogPath.open('r') as logFile:
+                        for line in logFile:
+                            message = PluginMessage.PluginMessageFactory(line, self.__organizer)
+                            if message:
+                                gameMessageList.append(message)
+                except Exception as e:
+                    qDebug(str(e))
+                    # There's almost certainly just no log yet
+                    pass
+
+        if editorSuffix is not None:
+            editorLogPath = base / editorSuffix
+            if editorLogPath.exists():
+                try:
+                    with editorLogPath.open('r') as logFile:
+                        for line in logFile:
+                            message = PluginMessage.PluginMessageFactory(line, self.__organizer)
+                            if message:
+                                editorMessageList.append(message)
+                except Exception as e:
+                    qDebug(str(e))
+                    # There's almost certainly just no log yet
+                    pass
+
+        # Search each list for plugins that are not successful in either list
+        for gameMessage in gameMessageList:
+            if not gameMessage.successful():
+                for editorMessage in editorMessageList:
+                    if gameMessage.pluginPath() == editorMessage.pluginPath() and editorMessage.successful():
+                        break
+                else:
+                    message = gameMessage.asMessage()
+                    if message not in messageList:
+                        messageList.append(message)
+
+        for editorMessage in editorMessageList:
+            if not editorMessage.successful():
+                for gameMessage in gameMessageList:
+                    if editorMessage.pluginPath() == gameMessage.pluginPath() and gameMessage.successful():
+                        break
+                else:
+                    message = editorMessage.asMessage()
+                    if message not in messageList:
+                        messageList.append(message)
 
         return messageList
 
