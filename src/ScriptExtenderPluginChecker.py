@@ -11,12 +11,21 @@ if "mobase" not in sys.modules:
 
 
 class PluginMessage():
+
+    kUnknownOrigin = "<unknown>"
+
     def __init__(self, pluginPath, organizer):
         self._pluginPath = Path(pluginPath)
-        self._pluginOrigin = organizer.getFileOrigins(str(self._pluginPath.relative_to(organizer.managedGame().dataDirectory().absolutePath())))[-1]
+        try:
+            self._pluginOrigin = organizer.getFileOrigins(str(self._pluginPath.relative_to(organizer.managedGame().dataDirectory().absolutePath())))[-1]
+        except:
+            self._pluginOrigin = PluginMessage.kUnknownOrigin
 
     def successful(self):
-        return False
+        return not self.valid()
+
+    def valid(self):
+        return self._pluginOrigin != PluginMessage.kUnknownOrigin
 
     def asMessage(self):
         return self.__tr("{0} ({1}) existed.").format(self._pluginPath.name, self._pluginOrigin)
@@ -51,7 +60,7 @@ class NormalPluginMessage(PluginMessage):
         self.__loadStatus = match.group("loadStatus")
 
     def successful(self):
-        return self.__loadStatus == "loaded correctly"
+        return not self.valid() or self.__loadStatus == "loaded correctly"
 
     def asMessage(self):
         return self.__tr("{0} version {1} ({2}, {4}) {3}.").format(self.__name, self.__version, self._pluginPath.name, self.__trLoadStatus(), self._pluginOrigin)
@@ -86,7 +95,7 @@ class CouldntLoadPluginMessage(PluginMessage):
         self.__lastError = int(match.group("lastError"))
 
     def successful(self):
-        return False
+        return not self.valid()
 
     def asMessage(self):
         return self.__tr("Couldn't load {0} ({2}). The last error code was {1}.").format(self._pluginPath.name, self.__lastError, self._pluginOrigin)
@@ -102,7 +111,7 @@ class NotAPluginMessage(PluginMessage):
         super(NotAPluginMessage, self).__init__(match.group("pluginPath"), organizer)
 
     def successful(self):
-        return False
+        return not self.valid()
 
     def asMessage(self):
         return self.__tr("{0} ({1}) does not appear to be a script extender plugin.").format(self._pluginPath.name, self._pluginOrigin)
