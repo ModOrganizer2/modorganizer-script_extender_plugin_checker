@@ -98,7 +98,14 @@ class CouldntLoadPluginMessage(PluginMessage):
         return not self.valid()
 
     def asMessage(self):
-        return self.__tr("Couldn't load {0} ({2}). The last error code was {1}.").format(self._pluginPath.name, self.__lastError, self._pluginOrigin)
+        if self.__lastError == 126:
+            message = self.__tr("Couldn't load {0} ({2}). A dependency DLL could not be found (code {1}).")
+        elif self.__lastError == 193:
+            message = self.__tr("Couldn't load {0} ({2}). A DLL is invalid (code {1}).")
+        else:
+            message = self.__tr("Couldn't load {0} ({2}). The last error code was {1}.")
+        
+        return message.format(self._pluginPath.name, self.__lastError, self._pluginOrigin)
 
     def __tr(self, str):
         return QCoreApplication.translate("CouldntLoadPluginMessage", str)
