@@ -17,7 +17,7 @@ class PluginMessage():
     def __init__(self, pluginPath, organizer):
         self._pluginPath = Path(pluginPath)
         try:
-            self._pluginOrigin = organizer.getFileOrigins(str(self._pluginPath.relative_to(organizer.managedGame().dataDirectory().absolutePath())))[-1]
+            self._pluginOrigin = organizer.getFileOrigins(str(self._pluginPath.relative_to(organizer.managedGame().dataDirectory().absolutePath())))[0]
         except:
             self._pluginOrigin = PluginMessage.kUnknownOrigin
 
