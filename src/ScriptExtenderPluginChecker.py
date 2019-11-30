@@ -169,7 +169,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return self.__tr("Checks script extender log to see if any plugins failed to load.")
 
     def version(self):
-        return mobase.VersionInfo(1, 0, 0, mobase.ReleaseType.prealpha)
+        return mobase.VersionInfo(1, 1, 0, 0)
 
     def isActive(self):
         return ( self.__organizer.managedGame().gameName() in self.supportedGames
