@@ -228,7 +228,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
             gameLogPath = base / gameSuffix
             if gameLogPath.exists():
                 try:
-                    with gameLogPath.open('r') as logFile:
+                    with gameLogPath.open('r', encoding='cp1252') as logFile:
                         for line in logFile:
                             message = PluginMessage.PluginMessageFactory(line, self.__organizer)
                             if message:
@@ -242,7 +242,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
             editorLogPath = base / editorSuffix
             if editorLogPath.exists():
                 try:
-                    with editorLogPath.open('r') as logFile:
+                    with editorLogPath.open('r', encoding='cp1252') as logFile:
                         for line in logFile:
                             message = PluginMessage.PluginMessageFactory(line, self.__organizer)
                             if message:
