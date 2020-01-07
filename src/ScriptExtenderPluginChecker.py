@@ -172,8 +172,8 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return mobase.VersionInfo(1, 1, 0, 0)
 
     def isActive(self):
-        return ( self.__organizer.managedGame().gameName() in self.supportedGames
-             and self.__organizer.pluginSetting(self.name(), "enabled") == True)
+        return (self.__organizer.managedGame().gameName() in self.supportedGames
+                and self.__organizer.pluginSetting(self.name(), "enabled") is True)
 
     def settings(self):
         return [
