@@ -226,31 +226,31 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
 
         if gameSuffix is not None:
             gameLogPath = base / gameSuffix
-            if gameLogPath.exists():
-                try:
+            try:
+                if gameLogPath.exists():
                     with gameLogPath.open('r', encoding='cp1252') as logFile:
                         for line in logFile:
                             message = PluginMessage.PluginMessageFactory(line, self.__organizer)
                             if message:
                                 gameMessageList.append(message)
-                except Exception as e:
-                    qDebug(str(e))
-                    # There's almost certainly just no log yet
-                    pass
+            except Exception as e:
+                qDebug(str(e))
+                # There's almost certainly just no log yet
+                pass
 
         if editorSuffix is not None:
             editorLogPath = base / editorSuffix
-            if editorLogPath.exists():
-                try:
+            try:
+                if editorLogPath.exists():
                     with editorLogPath.open('r', encoding='cp1252') as logFile:
                         for line in logFile:
                             message = PluginMessage.PluginMessageFactory(line, self.__organizer)
                             if message:
                                 editorMessageList.append(message)
-                except Exception as e:
-                    qDebug(str(e))
-                    # There's almost certainly just no log yet
-                    pass
+            except Exception as e:
+                qDebug(str(e))
+                # There's almost certainly just no log yet
+                pass
 
         # Search each list for plugins that are not successful in either list
         for gameMessage in gameMessageList:
