@@ -86,7 +86,7 @@ class NormalPluginMessage(PluginMessage):
     def __tr(self, str):
         return QCoreApplication.translate("NormalPluginMessage", str)
 
-PluginMessage.registerMessageType((re.compile(r"plugin (?P<pluginPath>.+) \((?P<infoVersion>[\dA-Fa-f]{8}) (?P<name>.+) (?P<version>[\dA-Fa-f]{8})\) (?P<loadStatus>.+)\s"), NormalPluginMessage))
+PluginMessage.registerMessageType((re.compile(r"plugin (?P<pluginPath>.+) \((?P<infoVersion>[\dA-Fa-f]{8}) (?P<name>.+) (?P<version>[\dA-Fa-f]{8})\) (?P<loadStatus>.+) (\(handle \d+\))?\s"), NormalPluginMessage))
 
 
 class CouldntLoadPluginMessage(PluginMessage):
@@ -169,7 +169,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return self.__tr("Checks script extender log to see if any plugins failed to load.")
 
     def version(self):
-        return mobase.VersionInfo(1, 1, 0, 0)
+        return mobase.VersionInfo(1, 1, 1, 0)
 
     def isActive(self):
         return (self.__organizer.managedGame().gameName() in self.supportedGames
