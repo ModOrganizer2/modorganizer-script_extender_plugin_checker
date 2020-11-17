@@ -86,31 +86,34 @@ class NormalPluginMessage(PluginMessage):
     def __tr(self, str):
         return QCoreApplication.translate("NormalPluginMessage", str)
 
-PluginMessage.registerMessageType((re.compile(r"plugin (?P<pluginPath>.+) \((?P<infoVersion>[\dA-Fa-f]{8}) (?P<name>.+) (?P<version>[\dA-Fa-f]{8})\) (?P<loadStatus>.+) (\(handle \d+\))?\s"), NormalPluginMessage))
+PluginMessage.registerMessageType((re.compile(r"plugin (?P<pluginPath>.+) \((?P<infoVersion>[\dA-Fa-f]{8}) (?P<name>.+) (?P<version>[\dA-Fa-f]{8})\) (?P<loadStatus>.+)( \(handle \d+\))?\s"), NormalPluginMessage))
 
 
 class CouldntLoadPluginMessage(PluginMessage):
     def __init__(self, match, organizer):
         super(CouldntLoadPluginMessage, self).__init__(match.group("pluginPath"), organizer)
         self.__lastError = int(match.group("lastError"))
+        self.__scriptExtenderDetails = match.group("seDetails")
+        if not self.__scriptExtenderDetails or self.__scriptExtenderDetails.isspace():
+            self.__scriptExtenderDetails = ""
 
     def successful(self):
         return not self.valid()
 
     def asMessage(self):
         if self.__lastError == 126:
-            message = self.__tr("Couldn't load {0} ({2}). A dependency DLL could not be found (code {1}).")
+            message = self.__tr("Couldn't load {0} ({2}). A dependency DLL could not be found (code {1}). {3}")
         elif self.__lastError == 193:
             message = self.__tr("Couldn't load {0} ({2}). A DLL is invalid (code {1}).")
         else:
             message = self.__tr("Couldn't load {0} ({2}). The last error code was {1}.")
         
-        return message.format(self._pluginPath.name, self.__lastError, self._pluginOrigin)
+        return message.format(self._pluginPath.name, self.__lastError, self._pluginOrigin, self.__scriptExtenderDetails)
 
     def __tr(self, str):
         return QCoreApplication.translate("CouldntLoadPluginMessage", str)
 
-PluginMessage.registerMessageType((re.compile(r"couldn't load plugin (?P<pluginPath>.+) \(Error (code )?(?P<lastError>[-+]?\d+).*\)\s"), CouldntLoadPluginMessage))
+PluginMessage.registerMessageType((re.compile(r"couldn't load plugin (?P<pluginPath>.+) \(Error (code )?(?P<lastError>[-+]?\d+)(:\s*(?P<seDetails>.*))?\)\s"), CouldntLoadPluginMessage))
 
 
 class NotAPluginMessage(PluginMessage):
