@@ -165,6 +165,9 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
     def name(self):
         return "Script Extender Plugin Load Checker"
 
+    def localizedName(self):
+        return self.__tr("Script Extender Plugin Load Checker")
+
     def author(self):
         return "AnyOldName3"
 
@@ -174,14 +177,13 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
     def version(self):
         return mobase.VersionInfo(1, 1, 1, 0)
 
-    def isActive(self):
-        return (self.__organizer.managedGame().gameName() in self.supportedGames
-                and self.__organizer.pluginSetting(self.name(), "enabled") is True)
+    def requirements(self):
+        return [
+            mobase.PluginRequirementFactory.gameDependency(self.supportedGames)
+        ]
 
     def settings(self):
-        return [
-            mobase.PluginSetting("enabled", self.__tr("Enable the plugin"), True)
-            ]
+        return []
 
     def activeProblems(self):
         if self.__scanLog():
