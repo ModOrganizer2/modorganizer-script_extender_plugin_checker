@@ -147,7 +147,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         "Fallout 4" : GameType(LogLocation.DOCS, Path("F4SE") / "f4se.log", None), # No editor log defined
         "Oblivion" : GameType(LogLocation.INSTALL, Path("obse.log"), Path("obse_editor.log")),
         "New Vegas" : GameType(LogLocation.INSTALL, Path("nvse.log"), Path("nvse_editor.log")),
-        "TTW" : GameType(LogLocation.INSTALL, Path("ttw_nvse.log"), Path("nvse_editor.log")), # TODO: Needs to be confirmed
+        "TTW" : GameType(LogLocation.INSTALL, Path("nvse.log"), Path("nvse_editor.log")),
         "Fallout 3" : GameType(LogLocation.INSTALL, Path("fose.log"), Path("fose_editor.log"))
     }
 
@@ -175,7 +175,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return self.__tr("Checks script extender log to see if any plugins failed to load.")
 
     def version(self):
-        return mobase.VersionInfo(1, 1, 1, 0)
+        return mobase.VersionInfo(1, 2, 0, 0)
 
     def requirements(self):
         return [
