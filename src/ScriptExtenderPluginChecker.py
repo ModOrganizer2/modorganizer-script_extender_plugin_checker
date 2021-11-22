@@ -60,7 +60,7 @@ class NormalPluginMessage(PluginMessage):
         self.__loadStatus = match.group("loadStatus")
 
     def successful(self):
-        return not self.valid() or self.__loadStatus == "loaded correctly"
+        return not self.valid() or self.__loadStatus == "loaded correctly" or self.__loadStatus == "no version data"
 
     def asMessage(self):
         return self.__tr("{0} version {1} ({2}, {4}) {3}.").format(self.__name, self.__version, self._pluginPath.name, self.__trLoadStatus(), self._pluginOrigin)
