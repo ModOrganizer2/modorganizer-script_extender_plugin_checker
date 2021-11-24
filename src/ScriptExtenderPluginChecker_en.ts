@@ -3,17 +3,17 @@
 <context>
     <name>CouldntLoadPluginMessage</name>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="109"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="116"/>
         <source>Couldn&apos;t load {0} ({2}). The last error code was {1}.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="107"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="114"/>
         <source>Couldn&apos;t load {0} ({2}). A DLL is invalid (code {1}).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="105"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="112"/>
         <source>Couldn&apos;t load {0} ({2}). A dependency DLL could not be found (code {1}). {3}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -26,12 +26,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="72"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="81"/>
         <source>reported as incompatible during query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="73"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="82"/>
         <source>reported as incompatible during load</source>
         <translation type="unfinished"></translation>
     </message>
@@ -41,17 +41,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="75"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="76"/>
         <source>disabled, no name specified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="76"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="83"/>
         <source>disabled, fatal error occurred while checking plugin compatibility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="77"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="84"/>
         <source>disabled, fatal error occurred while querying plugin</source>
         <translation type="unfinished"></translation>
     </message>
@@ -60,11 +60,21 @@
         <source>{0} version {1} ({2}, {4}) {3}.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="ScriptExtenderPluginChecker.py" line="78"/>
+        <source>disabled, incompatible with current runtime version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ScriptExtenderPluginChecker.py" line="79"/>
+        <source>disabled, requires newer script extender</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotAPluginMessage</name>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="127"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="134"/>
         <source>{0} ({1}) does not appear to be a script extender plugin.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -80,17 +90,17 @@
 <context>
     <name>ScriptExtenderPluginChecker</name>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="175"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="182"/>
         <source>Checks script extender log to see if any plugins failed to load.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="195"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="202"/>
         <source>Script extender log reports incompatible plugins.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="200"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="207"/>
         <source>You have one or more script extender plugins which failed to load!
 
  If you want this notification to go away, here are some steps you can take:
@@ -104,7 +114,7 @@ The failed plugins are:{0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ScriptExtenderPluginChecker.py" line="169"/>
+        <location filename="ScriptExtenderPluginChecker.py" line="176"/>
         <source>Script Extender Plugin Load Checker</source>
         <translation type="unfinished"></translation>
     </message>
