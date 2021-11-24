@@ -86,7 +86,7 @@ class NormalPluginMessage(PluginMessage):
     def __tr(self, str):
         return QCoreApplication.translate("NormalPluginMessage", str)
 
-PluginMessage.registerMessageType((re.compile(r"plugin (?P<pluginPath>.+) \((?P<infoVersion>[\dA-Fa-f]{8}) (?P<name>.+) (?P<version>[\dA-Fa-f]{8})\) (?P<loadStatus>.+?)( \(handle \d+\))?\s$"), NormalPluginMessage))
+PluginMessage.registerMessageType((re.compile(r"plugin (?P<pluginPath>.+) \((?P<infoVersion>[\dA-Fa-f]{8}) (?P<name>.*) (?P<version>[\dA-Fa-f]{8})\) (?P<loadStatus>.+?)(?P<errorCode> \d+)?( \(handle \d+\))?\s$"), NormalPluginMessage))
 
 
 class CouldntLoadPluginMessage(PluginMessage):
