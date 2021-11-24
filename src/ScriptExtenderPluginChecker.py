@@ -69,12 +69,19 @@ class NormalPluginMessage(PluginMessage):
         # We need to list the possible options so they get detected as translatable strings.
         loadStatusTranslations = {
             "loaded correctly" : self.__tr("loaded correctly"),
+            # Messages taken from SKSE64 2.1.3
+            "disabled, address library needs to be updated" : self.__tr("disabled, address library needs to be updated"),
+            "disabled, fatal error occurred while loading plugin" : self.__tr("disabled, fatal error occurred while loading plugin"),
+            "disabled, bad version data" : self.__tr("disabled, bad version data"),
+            "disabled, no name specified" : self.__tr("disabled, no name specified"),
+            "disabled, unsupported version independence method" : self.__tr("disabled, unsupported version independence method"),
+            "disabled, incompatible with current runtime version" : self.__tr("disabled, incompatible with current runtime version"),
+            "disabled, requires newer script extender" : self.__tr("disabled, requires newer script extender"),
+            # Legacy messages
             "reported as incompatible during query" : self.__tr("reported as incompatible during query"),
             "reported as incompatible during load" : self.__tr("reported as incompatible during load"),
-            "disabled, fatal error occurred while loading plugin" : self.__tr("disabled, fatal error occurred while loading plugin"),
-            "disabled, no name specified" : self.__tr("disabled, no name specified"),
             "disabled, fatal error occurred while checking plugin compatibility" : self.__tr("disabled, fatal error occurred while checking plugin compatibility"),
-            "disabled, fatal error occurred while querying plugin" : self.__tr("disabled, fatal error occurred while querying plugin")
+            "disabled, fatal error occurred while querying plugin" : self.__tr("disabled, fatal error occurred while querying plugin"),
         }
         if self.__loadStatus in loadStatusTranslations:
             return loadStatusTranslations[self.__loadStatus]
