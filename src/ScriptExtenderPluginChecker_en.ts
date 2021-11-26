@@ -70,6 +70,21 @@
         <source>disabled, requires newer script extender</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="ScriptExtenderPluginChecker.py" line="73"/>
+        <source>disabled, address library needs to be updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ScriptExtenderPluginChecker.py" line="75"/>
+        <source>disabled, bad version data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ScriptExtenderPluginChecker.py" line="77"/>
+        <source>disabled, unsupported version independence method</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotAPluginMessage</name>
