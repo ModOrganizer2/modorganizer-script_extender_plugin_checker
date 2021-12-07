@@ -28,9 +28,9 @@ class PluginMessage():
         return self._pluginOrigin != PluginMessage.kUnknownOrigin
 
     def asMessage(self):
-        return self.__tr("{0} ({1}) existed.").format(self._pluginPath.name, self._pluginOrigin)
+        return self.tr("{0} ({1}) existed.").format(self._pluginPath.name, self._pluginOrigin)
 
-    def __tr(self, str):
+    def tr(self, str):
         return QCoreApplication.translate("PluginMessage", str)
 
     def pluginPath(self):
@@ -63,30 +63,30 @@ class NormalPluginMessage(PluginMessage):
         return not self.valid() or self.__loadStatus == "loaded correctly" or self.__loadStatus == "no version data"
 
     def asMessage(self):
-        return self.__tr("{0} version {1} ({2}, {4}) {3}.").format(self.__name, self.__version, self._pluginPath.name,
+        return self.tr("{0} version {1} ({2}, {4}) {3}.").format(self.__name, self.__version, self._pluginPath.name,
                                                                    self.__trLoadStatus(), self._pluginOrigin)
 
     def __trLoadStatus(self):
         # We need to list the possible options so they get detected as translatable strings.
         loadStatusTranslations = {
-            "loaded correctly": self.__tr("loaded correctly"),
+            "loaded correctly": self.tr("loaded correctly"),
             # Messages taken from SKSE64 2.1.3
-            "disabled, address library needs to be updated": self.__tr("disabled, address library needs to be updated"),
-            "disabled, fatal error occurred while loading plugin": self.__tr(
+            "disabled, address library needs to be updated": self.tr("disabled, address library needs to be updated"),
+            "disabled, fatal error occurred while loading plugin": self.tr(
                 "disabled, fatal error occurred while loading plugin"),
-            "disabled, bad version data": self.__tr("disabled, bad version data"),
-            "disabled, no name specified": self.__tr("disabled, no name specified"),
-            "disabled, unsupported version independence method": self.__tr(
+            "disabled, bad version data": self.tr("disabled, bad version data"),
+            "disabled, no name specified": self.tr("disabled, no name specified"),
+            "disabled, unsupported version independence method": self.tr(
                 "disabled, unsupported version independence method"),
-            "disabled, incompatible with current runtime version": self.__tr(
+            "disabled, incompatible with current runtime version": self.tr(
                 "disabled, incompatible with current runtime version"),
-            "disabled, requires newer script extender": self.__tr("disabled, requires newer script extender"),
+            "disabled, requires newer script extender": self.tr("disabled, requires newer script extender"),
             # Legacy messages
-            "reported as incompatible during query": self.__tr("reported as incompatible during query"),
-            "reported as incompatible during load": self.__tr("reported as incompatible during load"),
-            "disabled, fatal error occurred while checking plugin compatibility": self.__tr(
+            "reported as incompatible during query": self.tr("reported as incompatible during query"),
+            "reported as incompatible during load": self.tr("reported as incompatible during load"),
+            "disabled, fatal error occurred while checking plugin compatibility": self.tr(
                 "disabled, fatal error occurred while checking plugin compatibility"),
-            "disabled, fatal error occurred while querying plugin": self.__tr(
+            "disabled, fatal error occurred while querying plugin": self.tr(
                 "disabled, fatal error occurred while querying plugin"),
         }
         if self.__loadStatus in loadStatusTranslations:
@@ -96,7 +96,7 @@ class NormalPluginMessage(PluginMessage):
             # We aren't translating that.
             return self.__loadStatus
 
-    def __tr(self, str):
+    def tr(self, str):
         return QCoreApplication.translate("NormalPluginMessage", str)
 
 
@@ -118,15 +118,15 @@ class CouldntLoadPluginMessage(PluginMessage):
 
     def asMessage(self):
         if self.__lastError == 126:
-            message = self.__tr("Couldn't load {0} ({2}). A dependency DLL could not be found (code {1}). {3}")
+            message = self.tr("Couldn't load {0} ({2}). A dependency DLL could not be found (code {1}). {3}")
         elif self.__lastError == 193:
-            message = self.__tr("Couldn't load {0} ({2}). A DLL is invalid (code {1}).")
+            message = self.tr("Couldn't load {0} ({2}). A DLL is invalid (code {1}).")
         else:
-            message = self.__tr("Couldn't load {0} ({2}). The last error code was {1}.")
+            message = self.tr("Couldn't load {0} ({2}). The last error code was {1}.")
 
         return message.format(self._pluginPath.name, self.__lastError, self._pluginOrigin, self.__scriptExtenderDetails)
 
-    def __tr(self, str):
+    def tr(self, str):
         return QCoreApplication.translate("CouldntLoadPluginMessage", str)
 
 
@@ -143,10 +143,10 @@ class NotAPluginMessage(PluginMessage):
         return not self.valid()
 
     def asMessage(self):
-        return self.__tr("{0} ({1}) does not appear to be a script extender plugin.").format(self._pluginPath.name,
+        return self.tr("{0} ({1}) does not appear to be a script extender plugin.").format(self._pluginPath.name,
                                                                                              self._pluginOrigin)
 
-    def __tr(self, str):
+    def tr(self, str):
         return QCoreApplication.translate("NotAPluginMessage", str)
 
 
@@ -190,13 +190,13 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         return "Script Extender Plugin Load Checker"
 
     def localizedName(self):
-        return self.__tr("Script Extender Plugin Load Checker")
+        return self.tr("Script Extender Plugin Load Checker")
 
     def author(self):
         return "AnyOldName3"
 
     def description(self):
-        return self.__tr("Checks script extender log to see if any plugins failed to load.")
+        return self.tr("Checks script extender log to see if any plugins failed to load.")
 
     def version(self):
         return mobase.VersionInfo(1, 2, 0, 0)
@@ -216,12 +216,12 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
             return []
 
     def shortDescription(self, key):
-        return self.__tr("Script extender log reports incompatible plugins.")
+        return self.tr("Script extender log reports incompatible plugins.")
 
     def fullDescription(self, key):
         pluginList = self.__listBadPluginMessagess()
         pluginListString = "\n  • " + ("\n  • ".join(pluginList))
-        return self.__tr("You have one or more script extender plugins which failed to load!\n\n "
+        return self.tr("You have one or more script extender plugins which failed to load!\n\n "
                          "If you want this notification to go away, here are some steps you can take:\n"
                          "  • Look for updates to the mod or the specific plugin included in the mod.\n"
                          "  • Disable the mod containing the plugin.\n"
@@ -235,7 +235,7 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
     def startGuidedFix(self, key):
         pass
 
-    def __tr(self, str):
+    def tr(self, str):
         return QCoreApplication.translate("ScriptExtenderPluginChecker", str)
 
     def __scanLog(self):
