@@ -1,19 +1,18 @@
+from __future__ import annotations
+
+import re
 from enum import Enum, auto
 from pathlib import Path
-import re
-import sys
-from collections import namedtuple
+from typing import Callable, NamedTuple
 
+import mobase
 from PyQt6.QtCore import QCoreApplication, qDebug
 
-if "mobase" not in sys.modules:
-    import mock_mobase as mobase
 
-
-class PluginMessage():
+class PluginMessage:
     kUnknownOrigin = "<unknown>"
 
-    def __init__(self, pluginPath, organizer):
+    def __init__(self, pluginPath: str | Path, organizer: mobase.IOrganizer):
         self._pluginPath = Path(pluginPath)
         try:
             self._pluginOrigin = organizer.getFileOrigins(
@@ -30,20 +29,24 @@ class PluginMessage():
     def asMessage(self):
         return self.tr("{0} ({1}) existed.").format(self._pluginPath.name, self._pluginOrigin)
 
-    def tr(self, str):
-        return QCoreApplication.translate("PluginMessage", str)
+    def tr(self, value: str):
+        return QCoreApplication.translate("PluginMessage", value)
 
     def pluginPath(self):
         return self._pluginPath
 
-    messageTypes = []
+    messageTypes: list[tuple[re.Pattern[str], Callable[[re.Match[str], mobase.IOrganizer], PluginMessage]]] = []
 
     @staticmethod
-    def registerMessageType(messageType):
+    def registerMessageType(
+        messageType: tuple[
+            re.Pattern[str], Callable[[re.Match[str], mobase.IOrganizer], PluginMessage]
+        ],
+    ):
         PluginMessage.messageTypes.append(messageType)
 
     @staticmethod
-    def PluginMessageFactory(line, organizer):
+    def PluginMessageFactory(line: str, organizer: mobase.IOrganizer):
         for messageType in PluginMessage.messageTypes:
             match = messageType[0].fullmatch(line)
             if match:
@@ -52,8 +55,8 @@ class PluginMessage():
 
 
 class NormalPluginMessage(PluginMessage):
-    def __init__(self, match, organizer):
-        super(NormalPluginMessage, self).__init__(match.group("pluginPath"), organizer)
+    def __init__(self, match: re.Match[str], organizer: mobase.IOrganizer):
+        super().__init__(match.group("pluginPath"), organizer)
         self.__infoVersion = int(match.group("infoVersion"), 16)
         self.__name = match.group("name")
         self.__version = int(match.group("version"), 16)
@@ -96,8 +99,8 @@ class NormalPluginMessage(PluginMessage):
             # We aren't translating that.
             return self.__loadStatus
 
-    def tr(self, str):
-        return QCoreApplication.translate("NormalPluginMessage", str)
+    def tr(self, value: str):
+        return QCoreApplication.translate("NormalPluginMessage", value)
 
 
 PluginMessage.registerMessageType((re.compile(
@@ -106,8 +109,8 @@ PluginMessage.registerMessageType((re.compile(
 
 
 class CouldntLoadPluginMessage(PluginMessage):
-    def __init__(self, match, organizer):
-        super(CouldntLoadPluginMessage, self).__init__(match.group("pluginPath"), organizer)
+    def __init__(self, match: re.Match[str], organizer: mobase.IOrganizer):
+        super().__init__(match.group("pluginPath"), organizer)
         self.__lastError = int(match.group("lastError"))
         self.__scriptExtenderDetails = match.group("seDetails")
         if not self.__scriptExtenderDetails or self.__scriptExtenderDetails.isspace():
@@ -126,8 +129,8 @@ class CouldntLoadPluginMessage(PluginMessage):
 
         return message.format(self._pluginPath.name, self.__lastError, self._pluginOrigin, self.__scriptExtenderDetails)
 
-    def tr(self, str):
-        return QCoreApplication.translate("CouldntLoadPluginMessage", str)
+    def tr(self, value: str):
+        return QCoreApplication.translate("CouldntLoadPluginMessage", value)
 
 
 PluginMessage.registerMessageType((re.compile(
@@ -136,8 +139,8 @@ PluginMessage.registerMessageType((re.compile(
 
 
 class NotAPluginMessage(PluginMessage):
-    def __init__(self, match, organizer):
-        super(NotAPluginMessage, self).__init__(match.group("pluginPath"), organizer)
+    def __init__(self, match: re.Match[str], organizer: mobase.IOrganizer):
+        super().__init__(match.group("pluginPath"), organizer)
 
     def successful(self):
         return not self.valid()
@@ -146,8 +149,8 @@ class NotAPluginMessage(PluginMessage):
         return self.tr("{0} ({1}) does not appear to be a script extender plugin.").format(self._pluginPath.name,
                                                                                              self._pluginOrigin)
 
-    def tr(self, str):
-        return QCoreApplication.translate("NotAPluginMessage", str)
+    def tr(self, value: str):
+        return QCoreApplication.translate("NotAPluginMessage", value)
 
 
 PluginMessage.registerMessageType((re.compile(
@@ -161,7 +164,11 @@ class LogLocation(Enum):
 
 
 class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
-    GameType = namedtuple(("GameType"), ("base", "gameSuffix", "editorSuffix"))
+    class GameType(NamedTuple):
+        base: LogLocation
+        gameSuffix: Path | None
+        editorSuffix: Path | None
+
     supportedGames = {
         "Skyrim": GameType(LogLocation.DOCS, Path("SKSE") / "skse.log", Path("SKSE") / "skse_editor.log"),
         "Skyrim Special Edition": GameType(LogLocation.DOCS, Path("SKSE") / "skse64.log", None),
@@ -175,11 +182,12 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         "Fallout 3": GameType(LogLocation.INSTALL, Path("fose.log"), Path("fose_editor.log"))
     }
 
+    __organizer: mobase.IOrganizer
+
     def __init__(self):
         super(ScriptExtenderPluginChecker, self).__init__()
-        self.__organizer = None
 
-    def init(self, organizer):
+    def init(self, organizer: mobase.IOrganizer):
         self.__organizer = organizer
 
         organizer.onFinishedRun(lambda a, b: self._invalidate())
@@ -201,24 +209,24 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
     def version(self):
         return mobase.VersionInfo(1, 2, 0, 0)
 
-    def requirements(self):
+    def requirements(self) -> list[mobase.IPluginRequirement]:
         return [
-            mobase.PluginRequirementFactory.gameDependency(self.supportedGames)
+            mobase.PluginRequirementFactory.gameDependency(list(self.supportedGames))
         ]
 
-    def settings(self):
+    def settings(self) -> list[mobase.PluginSetting]:
         return []
 
-    def activeProblems(self):
+    def activeProblems(self) -> list[int]:
         if self.__scanLog():
             return [0]
         else:
             return []
 
-    def shortDescription(self, key):
+    def shortDescription(self, key: int):
         return self.tr("Script extender log reports incompatible plugins.")
 
-    def fullDescription(self, key):
+    def fullDescription(self, key: int):
         pluginList = self.__listBadPluginMessagess()
         pluginListString = "\n  • " + ("\n  • ".join(pluginList))
         return self.tr("You have one or more script extender plugins which failed to load!\n\n "
@@ -229,19 +237,19 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
                          "To refresh the script extender logs, you will need to run the game and/or editor again!\n\n"
                          "The failed plugins are:{0}").format(pluginListString)
 
-    def hasGuidedFix(self, key):
+    def hasGuidedFix(self, key: int):
         return False
 
-    def startGuidedFix(self, key):
+    def startGuidedFix(self, key: int):
         pass
 
-    def tr(self, str):
-        return QCoreApplication.translate("ScriptExtenderPluginChecker", str)
+    def tr(self, value: str):
+        return QCoreApplication.translate("ScriptExtenderPluginChecker", value)
 
     def __scanLog(self):
         return len(self.__listBadPluginMessagess()) > 0
 
-    def __listBadPluginMessagess(self):
+    def __listBadPluginMessagess(self) -> list[str]:
         base, gameSuffix, editorSuffix = self.supportedGames[self.__organizer.managedGame().gameName()]
 
         if base == LogLocation.DOCS:
@@ -249,9 +257,8 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
         elif base == LogLocation.INSTALL:
             base = Path(self.__organizer.managedGame().gameDirectory().absolutePath())
 
-        messageList = []
-        editorMessageList = []
-        gameMessageList = []
+        editorMessageList: list[PluginMessage] = []
+        gameMessageList: list[PluginMessage] = []
 
         if gameSuffix is not None:
             gameLogPath = base / gameSuffix
@@ -280,6 +287,8 @@ class ScriptExtenderPluginChecker(mobase.IPluginDiagnose):
                 qDebug(str(e))
                 # There's almost certainly just no log yet
                 pass
+
+        messageList: list[str] = []
 
         # Search each list for plugins that are not successful in either list
         for gameMessage in gameMessageList:
